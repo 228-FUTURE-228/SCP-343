@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
@@ -7,38 +8,20 @@ namespace SCP_343
     public class EventHandlers
     {
         public static System.Random random = new System.Random();
+        public static List<Player> scp343 = new List<Player>();
+        public void OnWaitingForPlayers()
+        {
+            scp343.Clear();
+        }
         public void OnRoundStarted()
         {
-            if (Chance(SCP_343.plugin.Config.SpawnChance) && Player.List.Where(x => x.Team == Team.CDP).Count() >= SCP_343.plugin.Config.MinimumClassD)
-            {
-                Player scp343 = Player.List.Where(x => x.Team == Team.CDP).ToList()[random.Next(Player.List.Where(x => x.Team == Team.CDP).Count())];
-                scp343.SetRole(RoleType.ClassD);
-                scp343.CustomInfo = SCP_343.plugin.Config.RoleName;
-                scp343.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                scp343.IsGodModeEnabled = true;
-                scp343.Ammo[(int)AmmoType.Nato556] = 0;
-                scp343.Ammo[(int)AmmoType.Nato762] = 0;
-                scp343.Ammo[(int)AmmoType.Nato9] = 0;
-                Scp173.TurnedPlayers.Add(scp343);
-                Scp096.TurnedPlayers.Add(scp343);
-                if (SCP_343.plugin.Config.SCP343SpawnBroadcast != "")
-                {
-                    scp343.ClearBroadcasts();
-                    scp343.Broadcast(15, SCP_343.plugin.Config.SCP343SpawnBroadcast.Replace("{time}", SCP_343.plugin.Config.TimeToOpenDoors.ToString()));
-                }
-                if (SCP_343.plugin.Config.BroadcastForAll != "")
-                {
-                    foreach (Player player in Player.List.Where(x => x.CustomInfo != SCP_343.plugin.Config.RoleName))
-                    {
-                        player.ClearBroadcasts();
-                        player.Broadcast(15, SCP_343.plugin.Config.BroadcastForAll);
-                    }
-                }
-            }
+            List<Player> classd = Player.List.Where(x => x.Team == Team.CDP).ToList();
+            if (random.Next(101) <= SCP_343.plugin.Config.SpawnChance && classd.Count() >= SCP_343.plugin.Config.MinimumClassD)
+                SpawnScp343(classd[random.Next(classd.Count())]);
         }
         public void OnInteractingDoor(InteractingDoorEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName && !ev.IsAllowed && ev.Door.ActiveLocks == 0)
+            if (scp343.Contains(ev.Player) && !ev.IsAllowed && ev.Door.ActiveLocks == 0)
             {
                 if (Round.ElapsedTime.TotalSeconds >= SCP_343.plugin.Config.TimeToOpenDoors)
                     ev.IsAllowed = true;
@@ -51,7 +34,7 @@ namespace SCP_343
         }
         public void OnPickingUpItem(PickingUpItemEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
             {
                 ev.IsAllowed = false;
                 if (SCP_343.plugin.Config.ConvertToPainkillers)
@@ -63,62 +46,62 @@ namespace SCP_343
         }
         public void OnReceivingEffect(ReceivingEffectEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnHandcuffing(HandcuffingEventArgs ev)
         {
-            if (ev.Target.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Target))
                 ev.IsAllowed = false;
         }
         public void OnEscaping(EscapingEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnDetonated()
         {
-            foreach (Player scp343 in Player.List.Where(x => x.CustomInfo == SCP_343.plugin.Config.RoleName))
+            foreach (Player scp343 in scp343)
                 scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.ChaosInsurgency);
         }
         public void OnDecontaminating(DecontaminatingEventArgs ev)
         {
-            foreach (Player scp343 in Player.List.Where(x => x.CustomInfo == SCP_343.plugin.Config.RoleName))
+            foreach (Player scp343 in scp343)
                 scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp096);
         }
         public void OnEnteringPocketDimension(EnteringPocketDimensionEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnEnteringFemurBreaker(EnteringFemurBreakerEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnTriggeringTesla(TriggeringTeslaEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsTriggerable = false;
         }
         public void OnContaining(ContainingEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
+            if (scp343.Contains(ev.Player))
                 ev.IsAllowed = false;
         }
         public void OnEndingRound(EndingRoundEventArgs ev)
         {
-            if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies > 0 && ev.ClassList.mtf_and_guards == 0 && ev.ClassList.scientists == 0 && ev.ClassList.chaos_insurgents >= 0 && ev.ClassList.class_ds == Player.List.Where(x => x.CustomInfo == SCP_343.plugin.Config.RoleName).Count())
+            if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies > 0 && ev.ClassList.mtf_and_guards == 0 && ev.ClassList.scientists == 0 && ev.ClassList.chaos_insurgents >= 0 && ev.ClassList.class_ds == scp343.Count())
             {
                 ev.IsAllowed = true;
                 ev.IsRoundEnded = true;
             }
-            else if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies == 0 && ev.ClassList.mtf_and_guards >= 0 && ev.ClassList.scientists >= 0 && ev.ClassList.chaos_insurgents == 0 && ev.ClassList.class_ds == Player.List.Where(x => x.CustomInfo == SCP_343.plugin.Config.RoleName).Count())
+            else if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies == 0 && ev.ClassList.mtf_and_guards >= 0 && ev.ClassList.scientists >= 0 && ev.ClassList.chaos_insurgents == 0 && ev.ClassList.class_ds == scp343.Count())
             {
                 ev.IsAllowed = true;
                 ev.IsRoundEnded = true;
@@ -126,51 +109,60 @@ namespace SCP_343
         }
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName && !ev.IsEscaped)
-            {
-                ev.Player.CustomInfo = string.Empty;
-                ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-                ev.Player.IsGodModeEnabled = false;
-                Scp173.TurnedPlayers.Remove(ev.Player);
-                Scp096.TurnedPlayers.Remove(ev.Player);
-                if (SCP_343.plugin.Config.DieCassie != "")
-                    Cassie.DelayedMessage(SCP_343.plugin.Config.DieCassie, 1);
-                if (SCP_343.plugin.Config.DieBroadcast != "")
-                {
-                    Map.ClearBroadcasts();
-                    Map.Broadcast(15, SCP_343.plugin.Config.DieBroadcast);
-                }
-            }
+            if (scp343.Contains(ev.Player) && !ev.IsEscaped)
+                KillScp343(ev.Player);
         }
         public void OnDestroying(DestroyingEventArgs ev)
         {
-            if (ev.Player.CustomInfo == SCP_343.plugin.Config.RoleName)
-            {
-                ev.Player.CustomInfo = string.Empty;
-                ev.Player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-                ev.Player.IsGodModeEnabled = false;
-                Scp173.TurnedPlayers.Remove(ev.Player);
-                Scp096.TurnedPlayers.Remove(ev.Player);
-                if (SCP_343.plugin.Config.DieCassie != "")
-                    Cassie.DelayedMessage(SCP_343.plugin.Config.DieCassie, 1);
-                if (SCP_343.plugin.Config.DieBroadcast != "")
-                {
-                    Map.ClearBroadcasts();
-                    Map.Broadcast(15, SCP_343.plugin.Config.DieBroadcast);
-                }
-            }
+            if (scp343.Contains(ev.Player))
+                KillScp343(ev.Player);
         }
         public void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Target.CustomInfo == SCP_343.plugin.Config.RoleName && (ev.HitInformations.GetDamageType() == DamageTypes.Decont || (ev.DamageType == DamageTypes.Nuke && Warhead.IsDetonated)))
+            if (scp343.Contains(ev.Target) && (ev.HitInformations.GetDamageType() == DamageTypes.Decont || (ev.DamageType == DamageTypes.Nuke && Warhead.IsDetonated)))
                 ev.IsAllowed = false;
         }
-        public bool Chance(int percent)
+        public static void SpawnScp343(Player player)
         {
-            if (random.Next(101) <= percent)
-                return true;
-            else
-                return false;
+            player.SetRole(RoleType.ClassD);
+            player.CustomInfo = SCP_343.plugin.Config.RoleName;
+            player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+            player.IsGodModeEnabled = true;
+            player.Ammo[(int)AmmoType.Nato556] = 0;
+            player.Ammo[(int)AmmoType.Nato762] = 0;
+            player.Ammo[(int)AmmoType.Nato9] = 0;
+            Scp173.TurnedPlayers.Add(player);
+            Scp096.TurnedPlayers.Add(player);
+            scp343.Add(player);
+            if (SCP_343.plugin.Config.SCP343SpawnBroadcast != "")
+            {
+                player.ClearBroadcasts();
+                player.Broadcast(15, SCP_343.plugin.Config.SCP343SpawnBroadcast.Replace("{time}", SCP_343.plugin.Config.TimeToOpenDoors.ToString()));
+            }
+            if (SCP_343.plugin.Config.BroadcastForAll != "")
+            {
+                foreach (Player player_to_broadcast in Player.List.Where(x => !scp343.Contains(x)))
+                {
+                    player_to_broadcast.ClearBroadcasts();
+                    player_to_broadcast.Broadcast(15, SCP_343.plugin.Config.BroadcastForAll);
+                }
+            }
+        }
+        public static void KillScp343(Player player)
+        {
+            player.CustomInfo = string.Empty;
+            player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
+            player.IsGodModeEnabled = false;
+            Scp173.TurnedPlayers.Remove(player);
+            Scp096.TurnedPlayers.Remove(player);
+            scp343.Remove(player);
+            if (SCP_343.plugin.Config.DieCassie != "")
+                Cassie.DelayedMessage(SCP_343.plugin.Config.DieCassie, 1);
+            if (SCP_343.plugin.Config.DieBroadcast != "")
+            {
+                Map.ClearBroadcasts();
+                Map.Broadcast(15, SCP_343.plugin.Config.DieBroadcast);
+            }
         }
     }
 }
