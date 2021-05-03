@@ -8,13 +8,13 @@ namespace SCP_343
         public static SCP_343 plugin;
         public override string Author { get; } = "ФУТУР";
         public override string Name { get; } = "SCP-343";
-        public override Version Version { get; } = new Version(1, 1, 1);
+        public override Version Version { get; } = new Version(1, 2, 2);
         public override Version RequiredExiledVersion { get; } = new Version(2, 10, 0);
         public override void OnEnabled()
         {
-            base.OnEnabled();
             plugin = this;
             EventHandlers = new EventHandlers();
+            Exiled.Events.Handlers.Server.WaitingForPlayers += EventHandlers.OnWaitingForPlayers;
             Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnRoundStarted;
             Exiled.Events.Handlers.Player.InteractingDoor += EventHandlers.OnInteractingDoor;
             Exiled.Events.Handlers.Player.PickingUpItem += EventHandlers.OnPickingUpItem;
@@ -32,11 +32,11 @@ namespace SCP_343
             Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnChangingRole;
             Exiled.Events.Handlers.Player.Destroying += EventHandlers.OnDestroying;
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurting;
+            base.OnEnabled();
         }
-        public override void OnReloaded() { }
         public override void OnDisabled()
         {
-            base.OnDisabled();
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= EventHandlers.OnWaitingForPlayers;
             Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnRoundStarted;
             Exiled.Events.Handlers.Player.InteractingDoor -= EventHandlers.OnInteractingDoor;
             Exiled.Events.Handlers.Player.PickingUpItem -= EventHandlers.OnPickingUpItem;
@@ -55,6 +55,7 @@ namespace SCP_343
             Exiled.Events.Handlers.Player.Destroying -= EventHandlers.OnDestroying;
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurting;
             EventHandlers = null;
+            base.OnDisabled();
         }
     }
 }
