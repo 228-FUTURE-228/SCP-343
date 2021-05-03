@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SCP-343")]
 [assembly: AssemblyDescription("")]
