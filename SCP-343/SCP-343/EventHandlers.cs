@@ -61,15 +61,13 @@ namespace SCP_343
         }
         public void OnDetonated()
         {
-            foreach (Player scp343 in scp343)
-                if (Map.FindParentRoom(scp343.GameObject).Zone != ZoneType.Surface)
-                    scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.ChaosInsurgency);
+            foreach (Player scp343 in scp343.Where(x => x.CurrentRoom.Zone != ZoneType.Surface))
+                scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.ChaosInsurgency);
         }
         public void OnDecontaminating(DecontaminatingEventArgs ev)
         {
-            foreach (Player scp343 in scp343)
-                if (Map.FindParentRoom(scp343.GameObject).Zone == ZoneType.LightContainment)
-                    scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp096);
+            foreach (Player scp343 in scp343.Where(x => x.CurrentRoom.Zone == ZoneType.LightContainment))
+                scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp096);
         }
         public void OnEnteringPocketDimension(EnteringPocketDimensionEventArgs ev)
         {
@@ -98,15 +96,18 @@ namespace SCP_343
         }
         public void OnEndingRound(EndingRoundEventArgs ev)
         {
-            if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies > 0 && ev.ClassList.mtf_and_guards == 0 && ev.ClassList.scientists == 0 && ev.ClassList.chaos_insurgents >= 0 && ev.ClassList.class_ds == scp343.Count())
+            if (scp343.Count() > 0)
             {
-                ev.IsAllowed = true;
-                ev.IsRoundEnded = true;
-            }
-            else if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies == 0 && ev.ClassList.mtf_and_guards >= 0 && ev.ClassList.scientists >= 0 && ev.ClassList.chaos_insurgents == 0 && ev.ClassList.class_ds == scp343.Count())
-            {
-                ev.IsAllowed = true;
-                ev.IsRoundEnded = true;
+                if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies > 0 && ev.ClassList.mtf_and_guards == 0 && ev.ClassList.scientists == 0 && ev.ClassList.chaos_insurgents >= 0 && ev.ClassList.class_ds == scp343.Count())
+                {
+                    ev.IsAllowed = true;
+                    ev.IsRoundEnded = true;
+                }
+                else if (ev.ClassList.scps_except_zombies + ev.ClassList.zombies == 0 && ev.ClassList.mtf_and_guards >= 0 && ev.ClassList.scientists >= 0 && ev.ClassList.chaos_insurgents == 0 && ev.ClassList.class_ds == scp343.Count())
+                {
+                    ev.IsAllowed = true;
+                    ev.IsRoundEnded = true;
+                }
             }
         }
         public void OnChangingRole(ChangingRoleEventArgs ev)
