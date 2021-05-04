@@ -28,7 +28,7 @@ namespace SCP_343
                 else if (SCP_343.plugin.Config.SCP343WaitBroadcast != "")
                 {
                     ev.Player.ClearBroadcasts();
-                    ev.Player.Broadcast(15, SCP_343.plugin.Config.SCP343WaitBroadcast.Replace("{time}", (SCP_343.plugin.Config.TimeToOpenDoors - (int)Round.ElapsedTime.TotalSeconds).ToString()));
+                    ev.Player.Broadcast(5, SCP_343.plugin.Config.SCP343WaitBroadcast.Replace("{time}", (SCP_343.plugin.Config.TimeToOpenDoors - (int)Round.ElapsedTime.TotalSeconds).ToString()));
                 }
             }
         }
@@ -62,12 +62,14 @@ namespace SCP_343
         public void OnDetonated()
         {
             foreach (Player scp343 in scp343)
-                scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.ChaosInsurgency);
+                if (Map.FindParentRoom(scp343.GameObject).Zone != ZoneType.Surface)
+                    scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.ChaosInsurgency);
         }
         public void OnDecontaminating(DecontaminatingEventArgs ev)
         {
             foreach (Player scp343 in scp343)
-                scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp096);
+                if (Map.FindParentRoom(scp343.GameObject).Zone == ZoneType.LightContainment)
+                    scp343.Position = Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp096);
         }
         public void OnEnteringPocketDimension(EnteringPocketDimensionEventArgs ev)
         {
@@ -117,22 +119,14 @@ namespace SCP_343
             if (scp343.Contains(ev.Player))
                 KillScp343(ev.Player);
         }
-        public void OnHurting(HurtingEventArgs ev)
-        {
-            if (scp343.Contains(ev.Target) && (ev.HitInformations.GetDamageType() == DamageTypes.Decont || (ev.DamageType == DamageTypes.Nuke && Warhead.IsDetonated)))
-                ev.IsAllowed = false;
-        }
         public static void SpawnScp343(Player player)
         {
             player.SetRole(RoleType.ClassD);
             player.CustomInfo = SCP_343.plugin.Config.RoleName;
             player.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-            player.IsGodModeEnabled = true;
-            player.Ammo[(int)AmmoType.Nato556] = 0;
-            player.Ammo[(int)AmmoType.Nato762] = 0;
-            player.Ammo[(int)AmmoType.Nato9] = 0;
             Scp173.TurnedPlayers.Add(player);
             Scp096.TurnedPlayers.Add(player);
+            player.IsUsingStamina = false;
             scp343.Add(player);
             if (SCP_343.plugin.Config.SCP343SpawnBroadcast != "")
             {
@@ -152,9 +146,9 @@ namespace SCP_343
         {
             player.CustomInfo = string.Empty;
             player.ReferenceHub.nicknameSync.ShownPlayerInfo |= PlayerInfoArea.Role;
-            player.IsGodModeEnabled = false;
             Scp173.TurnedPlayers.Remove(player);
             Scp096.TurnedPlayers.Remove(player);
+            player.IsUsingStamina = true;
             scp343.Remove(player);
             if (SCP_343.plugin.Config.DieCassie != "")
                 Cassie.DelayedMessage(SCP_343.plugin.Config.DieCassie, 1);
@@ -163,6 +157,16 @@ namespace SCP_343
                 Map.ClearBroadcasts();
                 Map.Broadcast(15, SCP_343.plugin.Config.DieBroadcast);
             }
+        }
+        public void OnHurting(HurtingEventArgs ev)
+        {
+            if (scp343.Contains(ev.Target))
+                ev.IsAllowed = false;
+        }
+        public void OnPlacingBlood(PlacingBloodEventArgs ev)
+        {
+            if (scp343.Contains(ev.Player))
+                ev.IsAllowed = false;
         }
     }
 }
