@@ -1,10 +1,11 @@
-﻿using CommandSystem;
+using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
 namespace SCP_343.Command
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class SpawnCommand : ICommand
     {
         public string Command { get; } = "spawn343";
@@ -17,13 +18,18 @@ namespace SCP_343.Command
                 response = "You do not have permission to use this command!";
                 return false;
             }
+            if (!Round.IsStarted)
+            {
+                response = "You need to start the round!";
+                return false;
+            }
             if (arguments.Count == 1)
             {
-                Player scp343 = Player.Get(arguments.At(0));
-                if (scp343 != null)
+                Player player = Player.Get(arguments.At(0));
+                if (player != null)
                 {
-                    EventHandlers.SpawnScp343(scp343);
-                    response = $"Player {scp343.Nickname} is now SCP-343.";
+                    EventHandlers.SpawnScp343(player);
+                    response = $"Player {player.Nickname} is now SCP-343.";
                 }
                 else
                 {
