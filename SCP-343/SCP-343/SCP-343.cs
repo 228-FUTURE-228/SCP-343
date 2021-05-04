@@ -8,7 +8,7 @@ namespace SCP_343
         public static SCP_343 plugin;
         public override string Author { get; } = "ФУТУР";
         public override string Name { get; } = "SCP-343";
-        public override Version Version { get; } = new Version(1, 2, 2);
+        public override Version Version { get; } = new Version(1, 3, 3);
         public override Version RequiredExiledVersion { get; } = new Version(2, 10, 0);
         public override void OnEnabled()
         {
@@ -32,6 +32,7 @@ namespace SCP_343
             Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnChangingRole;
             Exiled.Events.Handlers.Player.Destroying += EventHandlers.OnDestroying;
             Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnHurting;
+            Exiled.Events.Handlers.Map.PlacingBlood += EventHandlers.OnPlacingBlood;
             base.OnEnabled();
         }
         public override void OnDisabled()
@@ -54,6 +55,7 @@ namespace SCP_343
             Exiled.Events.Handlers.Player.ChangingRole -= EventHandlers.OnChangingRole;
             Exiled.Events.Handlers.Player.Destroying -= EventHandlers.OnDestroying;
             Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnHurting;
+            Exiled.Events.Handlers.Map.PlacingBlood -= EventHandlers.OnPlacingBlood;
             EventHandlers = null;
             base.OnDisabled();
         }
