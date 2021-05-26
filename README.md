@@ -8,7 +8,7 @@ SCP-343 may also appear on its own (view configs).
 | `IsEnabled` | true | bool | Is the SCP-343 plugin enabled? |
 | `SpawnChance` | 15 | int | The chance of SCP-343 appearing at the beginning of the round. |
 | `MinimumClassD` | 5 | int | The minimum amount of ClassD for SCP-343 to spawn. |
-| `RoleName` | "<color=#FF0000>SCP-343</color>" | string | The name of the role that is displayed when you hover over the player. |
+| `RoleName` |<color=#FF0000>SCP-343</color>| string | The name of the role that is displayed when you hover over the player. |
 | `SCP343SpawnBroadcast` | You are SCP-343. You have immortality. You will be able to open all doors after {time} seconds. | string | Message to SCP-343. |
 | `BroadcastForAll` | SCP-343 appeared in the complex. | string | Message to all. |
 | `TimeToOpenDoors` | 120 | int | The time after which SCP-343 will be able to open all doors. |
