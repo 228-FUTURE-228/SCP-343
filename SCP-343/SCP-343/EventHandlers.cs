@@ -9,15 +9,12 @@ namespace SCP_343
     {
         public static System.Random random = new System.Random();
         public static List<Player> scp343 = new List<Player>();
-        public void OnWaitingForPlayers()
-        {
-            scp343.Clear();
-        }
+        public void OnWaitingForPlayers() => scp343.Clear();
         public void OnRoundStarted()
         {
             List<Player> classd = Player.List.Where(x => x.Team == Team.CDP).ToList();
             if (random.Next(101) <= SCP_343.plugin.Config.SpawnChance && classd.Count() >= SCP_343.plugin.Config.MinimumClassD)
-                SpawnScp343(classd[random.Next(classd.Count())]);
+                SpawnScp343(classd.FirstOrDefault());
         }
         public void OnInteractingDoor(InteractingDoorEventArgs ev)
         {
