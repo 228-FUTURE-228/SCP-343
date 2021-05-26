@@ -1,8 +1,11 @@
 # SCP-343
 Will add SCP-343 to your server. The plugin requires EXILED to work.  
-Usage: spawn343 / 343 (player id / name).  
-SCP-343 may also appear on its own (view configs).  
-
+### Commands
+| Command | Decription |
+| ------------------------------ | ------------------------------ |
+| `spawn343 <player id / name>` | Command to spawn SCP-343. |
+| `343 <player id / name>` | Alternate command for spawning SCP-343. |
+### Configuration
 | Config | Default value | Type | Decription |
 | ------------------------------ | ------------------------------ | ------------------------------ | ------------------------------ |
 | `IsEnabled` | true | bool | Is the SCP-343 plugin enabled? |
