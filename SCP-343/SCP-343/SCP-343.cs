@@ -8,7 +8,7 @@ namespace SCP_343
         public static SCP_343 plugin;
         public override string Author { get; } = "ФУТУР";
         public override string Name { get; } = "SCP-343";
-        public override Version Version { get; } = new Version(1, 4, 4);
+        public override Version Version { get; } = new Version(1, 5, 5);
         public override Version RequiredExiledVersion { get; } = new Version(2, 10, 0);
         public override void OnEnabled()
         {
