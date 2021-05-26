@@ -1,5 +1,5 @@
-# SCP-343
-Will add SCP-343 to your server. The plugin requires EXILED to work.  
+## SCP-343
+Will add SCP-343 to your server. The plugin requires [EXILED](https://github.com/Exiled-Team/EXILED) to work.  
 ### Commands
 | Command | Decription |
 | ------------------------------ | ------------------------------ |
